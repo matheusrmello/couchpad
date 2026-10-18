@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "couchpad"
+version = "0.1.0b1"
+description = "Controller-triggered TV and audio switching for KDE Plasma on Wayland"
+requires-python = ">=3.11"
+dependencies = ["evdev>=1.7"]
+
+[project.scripts]
+couchpad = "shiftpad_linux.cli:main"
+shiftpad-linux = "shiftpad_linux.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["shiftpad_linux*"]
+
+[tool.setuptools.package-data]
+shiftpad_linux = ["assets/*.svg"]

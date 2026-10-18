@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=CouchPad Beta
+Comment=Jogue na TV com troca automática de tela e áudio
+Exec=couchpad
+Icon=couchpad
+Terminal=false
+Categories=Game;Utility;
+StartupWMClass=CouchPad

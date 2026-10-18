@@ -1,0 +1,42 @@
+# Copie para ~/.config/shiftpad-linux/config.toml e ajuste os nomes pelo comando doctor.
+# DP-2 é o monitor principal; HDMI-A-3 agora tem o EDID da TV Samsung.
+[general]
+# false: use o controle no monitor do PC sem ativar a TV automaticamente.
+enabled = true
+
+[display]
+desktop_output = "DP-2"
+tv_output = "HDMI-A-3"
+tv_edid_sha256 = "1b0e4b21f5419e22c9cd7ca8d5b56316deb969345fc2bdb3e334de74a38e0f23"
+mode = "tv-only" # tv-only, extend ou mirror
+
+[audio]
+# Saída observada quando a Samsung fica ativa no modo tv-only.
+tv_sink = "alsa_output.pci-0000_04_00.0.hdmi-stereo-extra1"
+
+[gamepad]
+# Um trecho do nome limita o controle que poderá disparar a troca.
+name_contains = "8BitDo Ultimate 2 Wireless Controller"
+# IDs são preenchidos ao escolher um controle na janela; vazios mantêm o filtro por nome.
+vendor_id = ""
+product_id = ""
+uniq = ""
+# Vazio: conecta e ativa. Exemplo para exigir Start+Select: ["BTN_START", "BTN_SELECT"]
+activation_buttons = []
+connect_delay = 2
+disconnect_delay = 2
+
+[launcher]
+# Os comandos são argumentos separados, sem shell. Deixe vazio se não quiser abrir programas.
+start = ["/usr/bin/steam", "steam://open/bigpicture"]
+stop = ["/usr/bin/steam", "steam://close/bigpicture"]
+# Escolha um executável, AppImage ou atalho .desktop pela janela. Pode ser usado junto com o Steam.
+custom_path = ""
+custom_enabled = false
+custom_close = false # Fecha apenas o processo do programa iniciado pelo CouchPad ao restaurar.
+custom_args = [] # Exemplo para Hydra Launcher: ["--big-picture"]
+
+[cec]
+# CEC exige adaptador/programa compatível; estes comandos são opcionais.
+on = []
+off = []

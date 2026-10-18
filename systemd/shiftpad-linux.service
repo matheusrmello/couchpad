@@ -1,0 +1,14 @@
+[Unit]
+Description=CouchPad gamepad-triggered TV profile
+After=graphical-session.target pipewire.service
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Documents/shitPad-rea
+ExecStart=/usr/bin/python3 -m shiftpad_linux run
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

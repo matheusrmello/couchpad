@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+appdir="${APPDIR:-$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)}"
+export COUCHPAD_APPIMAGE=1
+exec "$appdir/usr/bin/couchpad" "$@"

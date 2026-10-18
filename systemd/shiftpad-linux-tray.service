@@ -1,0 +1,15 @@
+[Unit]
+Description=CouchPad tray icon and settings
+After=graphical-session.target shiftpad-linux.service
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Documents/shitPad-rea
+Environment=GDK_BACKEND=x11
+ExecStart=/usr/bin/python3 -m shiftpad_linux tray
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
