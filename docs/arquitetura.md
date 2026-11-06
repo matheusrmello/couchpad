@@ -4,8 +4,13 @@
 
 ## Visão atual
 
-O aplicativo é Python 3.11+; a beta local foi congelada com o Python 3.14 do
-host de build. A interface usa GTK 3 por PyGObject. A integração de telas é
+Atualização: o AppImage usa a interface Qt Quick/PySide6 em `qt_frontend.py`
+e `qml/Main.qml`. A interface GTK histórica permanece disponível pelo comando
+`tray`. O backend, o IPC e os caminhos persistidos continuam os mesmos. As
+descrições de widgets GTK abaixo referem-se à interface histórica.
+
+O aplicativo é Python 3.11+; a reconstrução de 06/11/2026 usa Python 3.11
+e glibc 2.36 do Debian 12, em vez do Python 3.14/glibc 2.44 do build antigo. A interface usa GTK 3 por PyGObject. A integração de telas é
 específica de KScreen; a janela força `GDK_BACKEND=x11` e usa XWayland na sessão
 Wayland testada. Ainda não existe uma seleção abstrata de adaptadores.
 
@@ -232,8 +237,9 @@ remove `LD_LIBRARY_PATH`, filtra caminhos internos e remove configurações
 privadas de loaders antes de iniciar ferramentas do host e inicializadores.
 O filho que executa o próprio monitor congelado mantém o ambiente do bundle.
 
-O hook do AppImage reloca configurações Glycin para um diretório temporário e
-aponta para os auxiliares incluídos. **Há uma limitação confirmada:** o sandbox
+O novo build Debian 12 usa GdkPixbuf/librsvg sem o auxiliar Glycin.
+O hook mantém compatibilidade com builds antigos: reloca configurações Glycin para um diretório temporário e
+aponta para os auxiliares incluídos. **No pacote antigo havia uma limitação confirmada:** o sandbox
 do auxiliar SVG usa bibliotecas do sistema, mesmo havendo cópias no bundle.
 Apenas copiar as bibliotecas não resolveu o Arch limpo; ver [Build e testes](build-testes.md).
 

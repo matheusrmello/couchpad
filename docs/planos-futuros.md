@@ -22,6 +22,11 @@ permissões que um único arquivo de interface não elimina.
 
 ## Etapa A — corrigir a portabilidade do pacote
 
+Atualização de 06/11/2026: base Debian 12/glibc 2.36 implementada, runtime
+aprovado em seis userlands limpos e bundle Flatpak local criado. Veja
+[o relatório](reconstrucao-2026-11-06.md). A publicação, auditoria completa
+de dependências e certificação de outras sessões gráficas continuam pendentes.
+
 Prioridade imediata antes de anunciar distribuição ampla:
 
 | Entrega | Critério de aceite |

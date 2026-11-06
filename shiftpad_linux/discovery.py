@@ -63,10 +63,13 @@ def display_devices() -> list[dict[str, Any]]:
     vendors = vendor_names()
     result = []
     for item in displays.capture()["outputs"]:
+        mode = next((m for m in item.get("modes", []) if m.get("id") == item.get("currentModeId")), {})
+        size = mode.get("size", {})
         entry: dict[str, Any] = {
             "output": item["name"],
             "connected": bool(item.get("connected")),
             "enabled": bool(item.get("enabled")),
+            "resolution": (f"{size['width']} × {size['height']}" if size.get('width') and size.get('height') else ""),
         }
         raw = read_edid(item["name"]) if entry["connected"] else None
         if raw:

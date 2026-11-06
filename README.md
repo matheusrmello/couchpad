@@ -41,41 +41,69 @@ TOML. HDR/CEC têm caminhos de código/configuração, mas faltam ensaios físic
 Receptores que permanecem expostos após desligar o controle, como o GameSir
 observado, podem exigir restauração manual.
 
-## AppImage beta local
+## AppImage e Flatpak — reconstrução de 06/11/2026
 
-Artefato gerado: `dist/CouchPad-0.1.0b1-x86_64.AppImage`.
-Se estiver presente, já é executável; abra com dois cliques ou pelo terminal.
-Sem argumentos, abre a janela e inicia/reutiliza o monitor automático.
-Preferências existentes são preservadas; um perfil novo começa desativado.
+O AppImage foi reconstruído em **Debian 12, Python 3.11 e glibc 2.36**, substituindo
+no pacote atual a exigência anterior de glibc 2.44. O build verifica todos os
+ELFs coletados e recusa símbolos acima de GLIBC_2.36. As bibliotecas de cliente
+Wayland/XCB e o carregador SVG estão incluídos.
 
-O build local exige **x86_64 e glibc 2.44**, além de KDE Plasma/Wayland,
-XWayland, `kscreen-doctor`, `pactl` e acesso aos dispositivos de controle.
-Os testes identificaram dependências efetivas de SVG/fontconfig no subprocesso
-de imagens, apesar de haver bibliotecas incluídas no pacote.
+Artefatos locais:
 
-| Ambiente testado | Resultado deste pacote |
-|---|---|
-| CachyOS de desenvolvimento | Abertura e funcionamento local exercitados |
-| Arch em Distrobox | Runtime passou após instalar `librsvg` e `fontconfig` no contêiner |
-| Debian 13, Ubuntu 26.04 e Fedora 44 em Distrobox | Falha por ausência de GLIBC_2.44 |
+- `dist/CouchPad-0.1.0b1-x86_64.AppImage`
+- `dist/CouchPad-0.1.0b1-x86_64.flatpak`
 
-Esses testes de contêiner não certificam a automação em outro DE. A próxima
-etapa de distribuição é reconstruir numa base mais antiga e corrigir as
-dependências do carregador de imagens.
+Ambos continuam requerendo **Linux x86_64, KDE Plasma/Wayland, XWayland,
+kscreen-doctor, pactl e permissão de leitura dos controles**. glibc 2.36 é o piso
+do novo payload; não significa suporte a qualquer desktop.
 
-[Manual do AppImage e reconstrução](packaging/appimage/README.md).
-`dist/` e `.build/` são saídas locais ignoradas; a presença do binário não é
-pressuposta num clone do projeto. Checksum e requisitos do artefato efetivo
-constam em `dist/build-info.json` e no arquivo `.sha256` correspondente.
+O mesmo AppImage passou em `--version` e `--runtime-check` (GTK, cairo, evdev e
+8 SVGs) em contêineres limpos de Debian 12/13, Ubuntu 24.04/26.04, Fedora 44 e
+Arch, sem instalar dependências extras. Isso valida carregamento, não a
+integração física com todos esses sistemas.
+
+O Flatpak é um **pacote de integração com o host**: usa
+`flatpak-spawn --host` para executar seu payload, com acesso como o usuário.
+Não oferece isolamento do backend e ainda exige glibc >= 2.36 no host.
+Não foi publicado no Flathub. Veja [o manual Flatpak](packaging/flatpak/README.md).
+
+```bash
+python3 tools/build_portable.py
+python3 tools/build_flatpak.py
+flatpak install --user dist/CouchPad-0.1.0b1-x86_64.flatpak
+flatpak run io.github.matheusrmello.CouchPad
+```
+
+Sem argumentos, os pacotes abrem a janela e iniciam/reutilizam o monitor.
+Um perfil novo começa desativado; preferências existentes são preservadas.
+`dist/` e `.build/` são ignorados pelo Git. A versão pública foi preservada;
+identifique esta reconstrução pelos hashes e manifestos que acompanham o binário.
+
+[Manual AppImage](packaging/appimage/README.md) ·
+[Relatório desta reconstrução](docs/reconstrucao-2026-11-06.md).
 
 ## Executar e verificar pelo código
 
-Obtenha o projeto pelo repositório oficial:
+### Interface Qt/QML
+
+A interface Qt Quick usa o mesmo monitor e socket, com seleção de TV, controle
+ e áudio, modo de tela, atrasos, Steam e outro inicializador. As seleções de
+ dispositivos e opções de sessão são salvas automaticamente; o outro programa
+ possui botão de salvar. Há interface GTK histórica pelo comando `tray`.
+
+Para executar do código, prepare a configuração e inicie o monitor:
 
 ```bash
-git clone https://github.com/matheusrmello/couchpad.git
-cd couchpad
+python3 -m venv --system-site-packages .build/qt-venv
+.build/qt-venv/bin/pip install -e '.[qt]'
+.build/qt-venv/bin/python -m shiftpad_linux run
+# Em outro terminal:
+.build/qt-venv/bin/python -m shiftpad_linux qt
 ```
+
+Os pacotes reconstruídos usam a interface Qt, com renderização por software
+por padrão para compatibilidade gráfica. O suporte de sistema continua limitado
+ao backend KDE/Wayland; Qt não adiciona adaptadores para GNOME ou Windows.
 
 Requer Python 3.11+, evdev, GTK 3/PyGObject/cairo e as ferramentas de integração.
 Prepare uma configuração própria antes de iniciar a interface ou a automação.

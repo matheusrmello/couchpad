@@ -1,0 +1,9 @@
+#!/bin/sh
+# The desktop backend needs the host PID namespace, tools and input devices.
+set -eu
+app_path=$(sed -n 's/^app-path=//p' /.flatpak-info)
+case "$app_path" in
+    /*) ;;
+    *) echo "CouchPad: caminho de instalação Flatpak indisponível" >&2; exit 1 ;;
+esac
+exec flatpak-spawn --host "$app_path/lib/couchpad/couchpad" "$@"

@@ -1,6 +1,9 @@
 # Documentação do CouchPad
 
-Consolidação em **17/10/2026**, referente ao código **0.1.0b1**.
+Consolidação original em **17/10/2026**, código **0.1.0b1**.
+
+**Atualização de 06/11/2026:** AppImage reconstruído em Debian 12/glibc 2.36,
+Flatpak local e nova validação com a TV. Veja [o relatório](reconstrucao-2026-11-06.md).
 
 O CouchPad é uma implementação independente para levar uma sessão de jogo do
 monitor à TV ao acionar um controle, ajustar áudio e inicializadores e restaurar
@@ -17,6 +20,8 @@ suporte implementado; um teste de biblioteca não significa teste do desktop.**
 |---|---|
 | [Guia de uso e funcionalidades](funcionalidades.md) | Interface, automação, áudio, tela, controles, inicializadores e limites de cada recurso |
 | [Arquitetura técnica](arquitetura.md) | Módulos, processos, estados, IPC, persistência, recuperação e dependências |
+| [Arquitetura de agentes de IA](agentes-ia.md) | Papéis, responsabilidades e colaboração para desenvolver o projeto |
+| [Interface Qt Quick](interface-qt.md) | Funcionalidades, execução e limites da interface Qt |
 | [Configuração e operação](configuracao-operacao.md) | TOML, CLI, caminhos, serviços, primeiro uso e diagnóstico |
 | [Histórico e decisões](historico-decisoes.md) | Origem, renomeações, evolução da interface, correções e escolhas do produto |
 | [Build, compatibilidade e testes](build-testes.md) | AppImage, requisitos reais, evidências, matriz de distribuições e reprodução |
@@ -29,12 +34,13 @@ suporte implementado; um teste de biblioteca não significa teste do desktop.**
 
 | Área | Situação |
 |---|---|
-| Janela, bandeja, autosave e seleção de dispositivos | Implementados em GTK 3 |
+| Janela, bandeja, autosave e seleção de dispositivos | Interface Qt Quick em desenvolvimento; GTK 3 histórica disponível |
 | TV exclusiva, estender e espelhar | Implementados via KScreen; testados no equipamento de desenvolvimento |
 | Áudio HDMI, volume 100% e restauração | Implementados via pactl; há teste real local e testes automatizados |
 | Escala de 275% em resolução 4K | Implementada; Full HD mantém a escala |
 | Steam Big Picture e outro inicializador | Implementados, com ressalvas para identificação e fechamento do processo |
-| AppImage | Beta local x86_64, atualmente dependente de glibc 2.44 e de componentes gráficos externos identificados nos testes |
+| AppImage | Reconstruído em Debian 12, glibc 2.36; runtime passou em seis userlands limpos |
+| Flatpak | Bundle local com execução do payload no host; exige glibc 2.36 e permissão de host |
 | Suíte automatizada | Última execução registrada: 56 testes aprovados |
 | GNOME, outros compositores e X11 genérico | Adaptadores ainda planejados |
 | Windows | Discussão de arquitetura; nenhum adaptador ou build Windows implementado |

@@ -298,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", type=Path, help="arquivo TOML de configuração")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("doctor", "devices", "preview", "switch", "restore", "status", "enable", "disable", "cancel", "run", "tray"):
+    for name in ("doctor", "devices", "preview", "switch", "restore", "status", "enable", "disable", "cancel", "run", "tray", "qt"):
         sub.add_parser(name)
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -313,6 +313,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "tray":
             from .tray import main as tray_main
             tray_main()
+        elif args.command == "qt":
+            from .qt_frontend import main as qt_main
+            return qt_main()
         elif args.command == "status":
             print(json.dumps(request("status"), ensure_ascii=False, indent=2))
         elif args.command == "cancel":

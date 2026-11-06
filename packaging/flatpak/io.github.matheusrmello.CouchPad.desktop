@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=CouchPad
+Comment=Jogue na TV com troca automática de tela e áudio
+Exec=couchpad
+Icon=io.github.matheusrmello.CouchPad
+Terminal=false
+Categories=Game;Utility;
+StartupWMClass=CouchPad

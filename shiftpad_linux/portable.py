@@ -114,6 +114,7 @@ def stop_monitor() -> None:
 
 
 def runtime_check() -> int:
+    from PySide6.QtCore import qVersion
     import gi
     gi.require_version("Gtk", "3.0")
     gi.require_version("GdkPixbuf", "2.0")
@@ -124,7 +125,7 @@ def runtime_check() -> int:
     for asset in assets.glob("*.svg"):
         GdkPixbuf.Pixbuf.new_from_file_at_scale(str(asset), 24, 24, True)
     print(json.dumps({"version": __version__, "frozen": bool(getattr(sys, "frozen", False)),
-                      "gtk": f"{Gtk.get_major_version()}.{Gtk.get_minor_version()}",
+                      "gtk": f"{Gtk.get_major_version()}.{Gtk.get_minor_version()}", "qt": qVersion(),
                       "assets": len(list(assets.glob("*.svg"))),
                       "evdev": bool(evdev.InputDevice), "cairo": cairo.cairo_version_string()},
                      ensure_ascii=False))
@@ -164,14 +165,12 @@ def main() -> int:
         ensure_configuration()
         owned = ensure_monitor()
         os.environ["COUCHPAD_OWNS_MONITOR"] = "1" if owned else "0"
-        import gi
-        gi.require_version("Gtk", "3.0")
-        from gi.repository import GLib, Gtk
+        from PySide6.QtCore import QTimer
+        from PySide6.QtWidgets import QApplication
         for signum in (signal.SIGTERM, signal.SIGINT):
-            signal.signal(signum, lambda *_: GLib.idle_add(Gtk.main_quit))
-        from .tray import main as tray_main
-        tray_main()
-        return 0
+            signal.signal(signum, lambda *_: QTimer.singleShot(0, QApplication.quit))
+        from .qt_frontend import main as qt_main
+        return qt_main()
     except Exception as exc:
         LOG.exception("Falha na inicialização da beta")
         show_error(str(exc))

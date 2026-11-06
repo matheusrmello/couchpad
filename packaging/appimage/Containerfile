@@ -1,0 +1,12 @@
+FROM docker.io/library/debian:12-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl file binutils squashfs-tools patchelf \
+    python3 libpython3.11 python3-venv python3-gi python3-gi-cairo python3-cairo python3-evdev \
+    gir1.2-gtk-3.0 gir1.2-rsvg-2.0 libgdk-pixbuf2.0-bin \
+    librsvg2-common fontconfig fonts-dejavu-core adwaita-icon-theme \
+    && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv --system-site-packages /opt/build-venv \
+    && /opt/build-venv/bin/pip install --no-cache-dir pyinstaller==6.22.3 PySide6==6.10.3
+ENV PATH="/opt/build-venv/bin:${PATH}"
+WORKDIR /src

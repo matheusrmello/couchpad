@@ -13,6 +13,8 @@ def host_environment() -> dict[str, str]:
     """Keep bundled libraries out of Steam, KScreen and other host programs."""
     env = os.environ.copy()
     if getattr(sys, "frozen", False):
+        if env.pop("COUCHPAD_PRIVATE_QT_BACKEND", "") == "1":
+            env.pop("QT_QUICK_BACKEND", None)
         original = env.pop("LD_LIBRARY_PATH_ORIG", "")
         if original:
             env["LD_LIBRARY_PATH"] = original
@@ -27,7 +29,7 @@ def host_environment() -> dict[str, str]:
                 else:
                     env.pop(key, None)
         for key in ("GDK_PIXBUF_MODULE_FILE", "GIO_MODULE_DIR", "GTK_DATA_PREFIX",
-                    "GTK_EXE_PREFIX", "GSETTINGS_SCHEMA_DIR"):
+                    "GTK_EXE_PREFIX", "GSETTINGS_SCHEMA_DIR", "FONTCONFIG_PATH", "FONTCONFIG_FILE"):
             if root and env.get(key, "").startswith(root):
                 env.pop(key, None)
         env.pop("GLYCIN_DATA_DIR", None)
