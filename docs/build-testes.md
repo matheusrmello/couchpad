@@ -1,5 +1,9 @@
 # Build, compatibilidade e testes
 
+> Registro do empacotamento anterior com glibc 2.44. A reconstrução de
+> 06/11/2026 usa glibc 2.36 e adiciona Flatpak; consulte
+> [o relatório atualizado](reconstrucao-2026-11-06.md).
+
 [Índice da documentação](README.md)
 
 ## Artefato atual
