@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 import platform
 import re
@@ -25,6 +26,9 @@ def main() -> None:
     tool = ROOT / ".build/downloads/appimagetool-x86_64.AppImage"
     if not tool.exists():
         raise SystemExit("Baixe appimagetool-x86_64.AppImage em .build/downloads primeiro; veja packaging/appimage/README.md")
+    tool_sha256 = hashlib.sha256(tool.read_bytes()).hexdigest()
+    if tool_sha256 != "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0":
+        raise SystemExit("SHA-256 de appimagetool 1.9.1 x86_64 não corresponde ao esperado")
     output.mkdir(exist_ok=True)
     subprocess.run([
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean",
@@ -53,12 +57,12 @@ def main() -> None:
         source = Path("/usr/share/licenses") / package
         if source.is_dir():
             shutil.copytree(source, notices / package, dirs_exist_ok=True)
-    artifact = output / f"CouchPad-{__version__}-x86_64.AppImage"
-    subprocess.run([str(tool), "--appimage-extract-and-run", "--no-appstream",
-                    str(appdir), str(artifact)], check=True)
-    artifact.chmod(0o755)
-    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
-    (output / f"{artifact.name}.sha256").write_text(f"{digest}  {artifact.name}\n")
+    shutil.copy2(ROOT / "LICENSE", docs / "LICENSE")
+    if Path("/usr/share/doc").is_dir() and Path("/etc/debian_version").exists():
+        for copyright in Path("/usr/share/doc").glob("*/copyright"):
+            destination = notices / copyright.parent.name
+            destination.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(copyright, destination / "copyright")
     glibc_versions = set()
     for binary in (appdir / "usr/bin").rglob("*"):
         if not binary.is_file() or binary.is_symlink():
@@ -70,12 +74,24 @@ def main() -> None:
                               capture_output=True, text=True, check=False).stdout
         glibc_versions.update(re.findall(r"GLIBC_(\d+\.\d+(?:\.\d+)?)", info))
     required_glibc = max(glibc_versions, key=lambda value: tuple(map(int, value.split("."))))
+    maximum = os.environ.get("COUCHPAD_MAX_GLIBC", "2.36")
+    if tuple(map(int, required_glibc.split("."))) > tuple(map(int, maximum.split("."))):
+        raise SystemExit(f"Build exige glibc {required_glibc}, acima do limite {maximum}. "
+                         "Use python3 tools/build_portable.py (Debian 12).")
+    artifact = output / f"CouchPad-{__version__}-x86_64.AppImage"
+    subprocess.run([str(tool), "--appimage-extract-and-run", "--no-appstream",
+                    str(appdir), str(artifact)], check=True)
+    artifact.chmod(0o755)
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    (output / f"{artifact.name}.sha256").write_text(f"{digest}  {artifact.name}\n")
     manifest = {"version": __version__, "architecture": platform.machine(),
                 "build_host": platform.platform(), "libc": platform.libc_ver(),
                 "required_glibc_symbols": required_glibc,
+                "python": platform.python_version(),
+                "appimagetool_sha256": tool_sha256,
                 "size_bytes": artifact.stat().st_size, "sha256": digest,
                 "scope": "Beta local: KDE Plasma/Wayland, XWayland, kscreen-doctor, pactl",
-                "bundled": ["Python", "GTK3", "PyGObject", "pycairo", "evdev", "SVG assets", "image loaders"],
+                "bundled": ["Python", "Qt Quick", "PySide6", "GTK3", "PyGObject", "pycairo", "evdev", "SVG assets", "image loaders"],
                 "unverified": ["other Linux distributions", "GNOME", "other compositors"]}
     (output / "build-info.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     print(artifact)

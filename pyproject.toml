@@ -9,6 +9,9 @@ description = "Controller-triggered TV and audio switching for KDE Plasma on Way
 requires-python = ">=3.11"
 dependencies = ["evdev>=1.7"]
 
+[project.optional-dependencies]
+qt = ["PySide6>=6.7,<6.11"]
+
 [project.scripts]
 couchpad = "shiftpad_linux.cli:main"
 shiftpad-linux = "shiftpad_linux.cli:main"
@@ -17,4 +20,4 @@ shiftpad-linux = "shiftpad_linux.cli:main"
 include = ["shiftpad_linux*"]
 
 [tool.setuptools.package-data]
-shiftpad_linux = ["assets/*.svg"]
+shiftpad_linux = ["assets/*.svg", "assets/ui/*.svg", "qml/*.qml", "qml/components/*.qml", "qml/components/qmldir", "assets/fonts/*"]

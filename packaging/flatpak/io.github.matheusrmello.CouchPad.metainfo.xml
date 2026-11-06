@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.matheusrmello.CouchPad</id>
+  <name>CouchPad</name>
+  <summary>Controller-triggered TV sessions for KDE Plasma</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>Prepare a gaming session on your TV and restore your desktop afterwards.
+    Supports KDE Plasma on Wayland with KScreen, PulseAudio-compatible audio,
+    and evdev controllers.</p>
+    <p>This desktop integration package launches its bundled application on the
+    host through flatpak-spawn. It has unrestricted access as your user, uses
+    the existing shiftpad-linux preferences, and requires host glibc 2.36 or
+    newer. It does not isolate the desktop backend in the Flatpak sandbox.</p>
+  </description>
+  <launchable type="desktop-id">io.github.matheusrmello.CouchPad.desktop</launchable>
+  <url type="homepage">https://github.com/matheusrmello/couchpad</url>
+  <releases><release version="0.1.0b1" date="2026-11-06"/></releases>
+</component>

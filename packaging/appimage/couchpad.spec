@@ -2,7 +2,23 @@ from pathlib import Path
 
 root = Path(SPECPATH).resolve().parents[1]
 binaries = []
-datas = [(str(root / "shiftpad_linux/assets"), "shiftpad_linux/assets")]
+# PyInstaller excludes these display-client libraries by default. GTK links
+# them even when the application selects X11; clean userlands may lack them.
+for name in ("libwayland-client.so.0", "libwayland-cursor.so.0",
+             "libwayland-egl.so.1", "libxcb.so.1"):
+    library = Path("/usr/lib/x86_64-linux-gnu") / name
+    if library.is_file():
+        binaries.append((str(library), "."))
+datas = [(str(root / "shiftpad_linux/assets"), "shiftpad_linux/assets"),
+         (str(root / "shiftpad_linux/qml"), "shiftpad_linux/qml")]
+# Match the bundled fontconfig library with its own configuration. New host
+# fontconfig rules may use syntax unsupported by Debian 12's library.
+if Path("/etc/fonts/fonts.conf").is_file():
+    datas.append(("/etc/fonts/fonts.conf", "etc/fonts"))
+    for config in Path("/etc/fonts/conf.d").glob("*.conf"):
+        datas.append((str(config.resolve()), "etc/fonts/conf.d"))
+if Path("/usr/share/fonts/truetype/dejavu").is_dir():
+    datas.append(("/usr/share/fonts/truetype/dejavu", "share/fonts/truetype/dejavu"))
 for name in ("glycin-svg", "glycin-image-rs"):
     helper = Path("/usr/lib/glycin-loaders/2+") / name
     config = Path("/usr/share/glycin-loaders/2+/conf.d") / f"{name}.conf"
@@ -23,7 +39,7 @@ a = Analysis(
     hooksconfig={"gi": {"icons": ["Adwaita", "hicolor"], "themes": ["Adwaita"],
                          "languages": ["pt", "pt_BR", "en"],
                          "module-versions": {"Gtk": "3.0", "Gdk": "3.0"}}},
-    excludes=["tkinter", "pytest", "numpy", "matplotlib", "PyQt5", "PyQt6", "PySide6"],
+    excludes=["tkinter", "pytest", "numpy", "matplotlib", "PyQt5", "PyQt6"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)

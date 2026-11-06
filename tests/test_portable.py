@@ -79,15 +79,26 @@ class PortableMonitorTest(unittest.TestCase):
 
 
 class HostEnvironmentTest(unittest.TestCase):
+    def test_explicit_qt_renderer_is_preserved_for_host_processes(self):
+        with patch.dict(os.environ, {'QT_QUICK_BACKEND': 'custom'}, clear=True), \
+             patch.object(system.sys, 'frozen', True, create=True), \
+             patch.object(system.sys, '_MEIPASS', '/bundle', create=True):
+            self.assertEqual(system.host_environment()['QT_QUICK_BACKEND'], 'custom')
+
     def test_host_process_does_not_inherit_bundled_libraries(self):
         env={'LD_LIBRARY_PATH':'/bundle:/original','LD_LIBRARY_PATH_ORIG':'/original',
              'GI_TYPELIB_PATH':'/bundle/gi_typelibs','XDG_DATA_DIRS':'/bundle/share:/usr/share',
-             'GDK_PIXBUF_MODULE_FILE':'/bundle/loaders.cache','DISPLAY':':1'}
+             'GDK_PIXBUF_MODULE_FILE':'/bundle/loaders.cache','DISPLAY':':1',
+             'FONTCONFIG_PATH':'/bundle/etc/fonts','FONTCONFIG_FILE':'/bundle/etc/fonts/fonts.conf',
+             'QT_QUICK_BACKEND':'software', 'COUCHPAD_PRIVATE_QT_BACKEND':'1'}
         with patch.dict(os.environ,env,clear=True), patch.object(system.sys,'frozen',True,create=True), \
              patch.object(system.sys,'_MEIPASS','/bundle',create=True):
             result=system.host_environment()
             self.assertEqual(result['LD_LIBRARY_PATH'],'/original')
             self.assertEqual(result['XDG_DATA_DIRS'],'/usr/share')
+            self.assertNotIn('FONTCONFIG_PATH', result)
+            self.assertNotIn('FONTCONFIG_FILE', result)
+            self.assertNotIn('QT_QUICK_BACKEND', result)
             self.assertEqual(result['DISPLAY'],':1')
             self.assertNotIn('GI_TYPELIB_PATH',result)
             self.assertNotIn('GDK_PIXBUF_MODULE_FILE',result)
